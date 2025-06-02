@@ -17,13 +17,16 @@ app.use(cors({
 }));
 app.use(express.json());
 
+
+
+
 // Configuración de la base de datos PostgreSQL
 const pool = new Pool({
-  user: process.env.DB_USER ,
-  host: process.env.DB_HOST ,
-  database: process.env.DB_NAME,
-  password: process.env.DB_PASSWORD ,
-  port: process.env.DB_PORT ,
+  POSTGRES_USER: process.env.POSTGRES_USER ,
+  PGHOST: process.env.PGHOST ,
+  PGPASSWORD: process.env.PGPASSWORD ,
+  POSTGRES_DB: process.env.POSTGRES_DB ,
+  PGPORT: process.env.PGPORT
 });
 console.log('DEBUG DB_USER:', process.env.DB_USER);
 
