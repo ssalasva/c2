@@ -1,0 +1,51 @@
+# --- Etapa 1: Construcción (Build Stage) ---
+# Esta etapa instala todas las dependencias de Node.js.
+# Usamos una imagen base ligera de Node.js (asegúrate de que la versión sea compatible con tu código).
+FROM node:20-slim AS builder
+
+# Establecemos el directorio de trabajo dentro del contenedor
+WORKDIR /app
+
+# Copiamos solo los archivos de dependencias para aprovechar el caché de Docker.
+# Si tu proyecto usa 'yarn.lock' en lugar de 'package-lock.json', copia ese archivo también.
+COPY package.json package-lock.json ./
+
+# Instala todas las dependencias (incluidas las de desarrollo si las necesitas para el build,
+# aunque para apps en producción, 'npm install --production' es mejor).
+# Si tienes 'package-lock.json' y quieres builds más reproducibles, usa 'npm ci'.
+RUN npm install
+
+# --- Etapa 2: Producción (Production Stage) ---
+# Esta etapa crea la imagen final, ligera, solo con el código y las dependencias ya instaladas.
+# Utilizamos la misma imagen base que en la etapa de construcción para consistencia.
+FROM node:20-slim
+
+# Establecemos el directorio de trabajo
+WORKDIR /app
+
+# Opcional: Configura la zona horaria si tu aplicación lo necesita.
+# Esto asegura que los logs y las operaciones basadas en tiempo sean correctas.
+# Puedes encontrar tu zona horaria en la lista de zonas horarias de IANA (ej. America/Santiago).
+ENV TZ="America/Santiago"
+
+# Copiamos las dependencias instaladas desde la etapa 'builder'
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copiamos todo el código fuente de tu aplicación al directorio de trabajo en el contenedor
+COPY . .
+
+# Las plataformas como Google Cloud Run o Railway esperan que tu aplicación escuche en el puerto
+# definido por la variable de entorno PORT (que por defecto es 8080).
+# Es CRUCIAL que tu código Node.js escuche en process.env.PORT.
+ENV PORT 8080
+EXPOSE 8080
+
+# Comando para iniciar tu aplicación Node.js.
+# Aquí indicamos que ejecute directamente el archivo 'server.js' con Node.js.
+CMD ["node", "server.js"]
+
+# --- Alternativa para CMD ---
+# Si tienes un script 'start' definido en tu package.json (ej. "start": "node server.js"),
+# puedes usar:
+# CMD ["npm", "start"]
+# Esto es más común y flexible si tu script de inicio puede variar.
