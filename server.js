@@ -22,13 +22,18 @@ app.use(express.json());
 
 // Configuración de la base de datos PostgreSQL
 const pool = new Pool({
-  POSTGRES_USER: process.env.POSTGRES_USER ,
-  PGHOST: process.env.PGHOST ,
-  PGPASSWORD: process.env.PGPASSWORD ,
-  POSTGRES_DB: process.env.POSTGRES_DB ,
-  PGPORT: process.env.PGPORT
+  user: process.env.POSTGRES_USER ,
+  host: process.env.PGHOST ,
+  password: process.env.PGPASSWORD ,
+  database: process.env.POSTGRES_DB ,
+  port: process.env.PGPORT
 });
-console.log('DEBUG DB_USER:', process.env.DB_USER);
+console.log('DEBUG DB_USER:', process.env.POSTGRES_USER);
+console.log('DEBUG DB_HOST:', process.env.PGHOST);
+console.log('DEBUG DB_PASSWORD:', process.env.PGPASSWORD);
+console.log('DEBUG DB_NAME:', process.env.POSTGRES_DB);
+console.log('DEBUG DB_PORT:', process.env.PGPORT);
+// Verificar conexión a la base de datos
 
 // Información del servidor MCP
 const MCP_SERVER_INFO = {
